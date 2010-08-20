@@ -6,14 +6,13 @@ from PMS.Shortcuts import *
 ####################################################################################################
 
 VIDEO_PREFIX = "/video/tekpub"
-
-NAME = L('Title')
-
-# make sure to replace artwork with what you want
-# these filenames reference the example files in
-# the Contents/Resources/ folder in the bundle
-ART           = 'art-default.png'
-ICON          = 'icon-default.png'
+BASE_URL       = "http://tekpub.com"
+PRODUCTION_URL = "http://tekpub.com/productions"
+NAME           = L('Title')
+CACHE_INTERVAL = 1800
+ART            = 'art-default.jpg'
+ICON           = 'icon-default.png'
+DEBUG          = True
 
 ####################################################################################################
 
@@ -39,15 +38,6 @@ def Start():
     MediaContainer.title1 = NAME
     DirectoryItem.thumb = R(ICON)
 
-  
-
-
-#### the rest of these are user created functions and
-#### are not reserved by the plugin framework.
-#### see: http://dev.plexapp.com/docs/Functions.html for
-#### a list of reserved functions above
-
-
 
 #
 # Example main menu referenced in the Start() method
@@ -55,7 +45,6 @@ def Start():
 #
 
 def VideoMainMenu():
-
     # Container acting sort of like a folder on
     # a file system containing other things like
     # "sub-folders", videos, music, etc
@@ -63,28 +52,44 @@ def VideoMainMenu():
     #  http://dev.plexapp.com/docs/Objects.html#MediaContainer
     dir = MediaContainer(viewGroup="InfoList")
 
-
     # see:
     #  http://dev.plexapp.com/docs/Objects.html#DirectoryItem
     #  http://dev.plexapp.com/docs/Objects.html#function-objects
-    dir.Append(
-        Function(
-            DirectoryItem(
-                CallbackExample,
-                "directory item title",
-                subtitle="subtitle",
-                summary="clicking on me will call CallbackExample",
-                thumb=R(ICON),
-                art=R(ART)
-            )
-        )
-    )
-
-
+    content = XML.ElementFromURL(PRODUCTION_URL, True)
+    for item in content.xpath('//div[@class="filter"]/a'):
+			titleUrl = item.get('href')
+			title = item.text
+			dir.Append(
+					Function(
+						DirectoryItem(CategoryPage, title, subtitle="", summary="", thumb=R(ICON), art=R(ART)), 
+						  pageUrl=BASE_URL+titleUrl)
+					)
     # ... and then return the container
     return dir
 
-def CallbackExample(sender):
+def CategoryPage(sender, pageUrl):
+    dir = MediaContainer(title2=sender.itemTitle)
+    dir.viewGroup = 'InfoList'
+    content = XML.ElementFromURL(pageUrl, True)
+    for item in content.xpath('//div[@class="column span-16 item"]'):
+  		# title = item.xpath('./h1').text
+			# titleUrl = item.xpath('./div[@class="column span-4"]/a').get('href')
+			# thumb = item.xpath('./div[@class="column span-4"]/a/img').get('src')
+			# description = item.xpath('./div[@class="column span-12"]/p').text
+			# dir.Append(Function(CallbackExample, title, subtitle="", summary=decription, thumb=R(BASE_URL+thumb), art=R(ART)), 
+			#		titleUrl=BASE_URL+titleUrl)
+			dir.Append(Function(
+				DirectoryItem(CallbackExample, "title", subtitle="subtitle", summar="summary", thumb=R(ICON), art=R(ART)),
+        titleUrl="/url")
+				)
+    return dir
+
+# def VideoPage(sender, titleUrl):
+#    dir = MediaContainer(title2=sender.itemTitle)
+#    dir.viewGroup = 'InfoList'
+#    return dir
+
+def CallbackExample(sender,titleUrl):
 
     ## you might want to try making me return a MediaContainer
     ## containing a list of DirectoryItems to see what happens =)
@@ -94,4 +99,4 @@ def CallbackExample(sender):
         "In real life, you'll make more than one callback,\nand you'll do something useful.\nsender.itemTitle=%s" % sender.itemTitle
     )
 
-  
+

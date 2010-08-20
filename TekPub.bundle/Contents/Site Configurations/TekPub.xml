@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site site="http://tekpub.com"
+	    plugin="http://tekpub.com/player/flowplayer-3.2.2.swf"
+			initialState="paused"
+			version="1.0">
+	
+			<!-- found these in the page source:
+					 [http://tekpub.com]/player/flowplayer-3.2.2.swf	
+           [http://tekpub.com]/player/flowplayer.rtmp-3.2.1.swf
+					 http://tekpub.com/player/flowplayer.controls-3.2.1.swf
+	     -->
+	<crop x="0" y="0" width="965" height="724" />
+	
+	<seekbar type="simple">
+		<start x="90" y="240" />
+		<end   x="435" y="240" />
+		<played>
+				<color rgb="FFFFFF" />
+		</played>
+	</seekbar>
+	
+	<!-- PLAYING -->
+	<state name="playing">
+		<event>
+			<condition>
+				<command name="pause" />
+			</condition>
+			<action>
+                  <click x="80" y="260" />
+ 				<click x="80" y="260" />
+				<goto state="paused" />
+			</action>
+		</event>
+		
+		<!-- Video ends -->
+		<event>
+			<condition>
+				<url matches="http://tekpub.com/" />
+			</condition>
+			<action>
+				<goto state="end" />
+			</action>
+		</event>
+	</state>
+	
+	<!-- PAUSED -->
+	<state name="paused">
+		<event>
+			<condition>
+				<command name="play" />
+			</condition>
+			<action>
+                  <click x="80" y="260" />
+ 				<click x="80" y="260" />
+				<goto state="playing" />
+			</action>
+		</event>
+	</state>
+</site>
+

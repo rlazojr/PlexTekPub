@@ -2,6 +2,7 @@
 from PMS import *
 from PMS.Objects import *
 from PMS.Shortcuts import *
+import re # <-- for regular expressions
 
 ####################################################################################################
 
@@ -69,17 +70,37 @@ def CategoryPage(sender, pageUrl):
 def VideoPage(sender, titleUrl):
     dir = MediaContainer(title2=sender.itemTitle)
     dir.viewGroup = 'InfoList'
+    idx = 0
     content = XML.ElementFromURL(titleUrl, True)
     slide = content.xpath('//div[@class="column span-17"]/img')[0].get('src')
-    idx = 0
     for item in content.xpath('//div[@class="item"]/h2/a'):
       title = item.text
       titleUrl = item.get('href')
       description = item.xpath('../../p')[idx].text
-      dir.Append(WebVideoItem(BASE_URL+titleUrl, thumb=R(ICON), title=title, 
-				summary=description))
+
+      # Opening the videopage at this point to find the info is going to take too much time, as we need to open pages for all the
+      # videos in the list we're buidling here.
+      # Instead we postpone those steps until the moment a user selects a video. For this we add an extra function that's going to
+      # be called at the moment a user selects a video. In this example it's called "PlayVideo" (you can name it whatever you
+      # want) and we send it the url of the video page.
+
+      dir.Append(Function(WebVideoItem(PlayVideo, title=title, summary=description, thumb=R(ICON)), url=BASE_URL+titleUrl))
+
       idx = idx + 1
+		
     return dir
+
+def PlayVideo(sender, url):
+    # Open the webpage containing the video
+    videopage = HTTP.Request(url)
+
+    # Find the two pieces of information we need in the webpage by using regular expressions
+    # These regex things may look a bit scary at first ;)
+    url  = re.search("netConnectionUrl: '(.+?)'", videopage).group(1)
+    clip = re.search("clip.+?url: '(.+?)'", videopage, re.DOTALL).group(1)
+
+    return Redirect(RTMPVideoItem(url, clip))
+
 
 def CallbackExample(sender,titleUrl):
 

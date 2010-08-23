@@ -2,3 +2,8 @@ My first attempt at a Plex plugin, aimed at enabling content from TekPub.com wit
 
 To start out, the functionality will be very limited. It may only ever support free content; depending on how much time I feel like putting into this, and whether Rob ends up providing easy integration facilities for parts like login.
 
+I'm done with basic functionality at this point. I'm not planning on implementing login for TekPub which means you don't get to view purchased series using this plugin. I'll update this README if I that changes.
+
+==Credit where credit is due==
+I got help from people on the Plex forums, and wanted to specifically give them credit; expescially this thread:
+http://forums.plexapp.com/index.php?/topic/15592-how-to-play-vid-from-flowplayer/page__p__93409__hl__tekpub__fromsearch__1&#entry93409
